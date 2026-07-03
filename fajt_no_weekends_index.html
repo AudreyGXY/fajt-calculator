@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#6f8f9f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="FAJT Pay" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <title>FAJT Pay Calculator</title>
+
+  <style>
+    :root {
+      --bg: #faf6f0;
+      --card: #ffffff;
+      --text: #25211d;
+      --muted: #70675e;
+      --line: #e3d7cc;
+      --accent: #6f8f9f;
+      --accent-dark: #3e6271;
+      --accent-soft: #eaf3f5;
+      --warm: #f3e8dc;
+      --danger: #b85c5c;
+      --danger-soft: #fff0f0;
+      --success: #4f7f62;
+      --success-soft: #edf6ef;
+      --upcoming: #f7f2ea;
+      --shadow: 0 10px 28px rgba(37, 33, 29, 0.08);
+      --radius: 20px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(111, 143, 159, 0.22), transparent 28rem),
+        linear-gradient(135deg, var(--bg), #edf4f5);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding: 14px;
+      padding-bottom: calc(112px + var(--safe-bottom));
+    }
+
+    .app {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 9vw, 44px);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 19px;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .hero {
+      padding: 18px 16px;
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .pill {
+      flex: 0 0 auto;
+      background: var(--accent-soft);
+      color: var(--accent-dark);
+      border: 1px solid rgba(111, 143, 159, 0.2);
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .subtitle {
+      margin-top: 10px;
+      color: var(--muted);
+      line-height: 1.4;
+      font-size: 15px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .grid.two {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 850;
+      margin: 0 0 7px;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      min-height: 50px;
+      border-radius: 15px;
+      font: inherit;
+      font-size: 16px;
+    }
+
+    input,
+    select {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      padding: 12px;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(111, 143, 159, 0.15);
+    }
+
+    button {
+      border: none;
+      padding: 12px 14px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.99);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--accent-dark);
+      border: 1px solid var(--line);
+    }
+
+    .btn-danger {
+      background: #fff2f2;
+      color: var(--danger);
+      border: 1px solid #f0c5c5;
+    }
+
+    .mode-options {
+      display: grid;
+      gap: 9px;
+      grid-template-columns: 1fr;
+    }
+
+    .mode {
+      position: relative;
+      display: block;
+      cursor: pointer;
+    }
+
+    .mode input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .mode-box {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .mode input:checked + .mode-box {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 3px rgba(111, 143, 159, 0.13);
+    }
+
+    .mode-title {
+      font-weight: 950;
+      font-size: 15px;
+    }
+
+    .mode-sub {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .time-section.hidden {
+      display: none;
+    }
+
+    .summary-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .summary-grid .wide {
+      grid-column: 1 / -1;
+    }
+
+    .summary-box {
+      background: var(--accent-soft);
+      border: 1px solid rgba(111, 143, 159, 0.2);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .summary-box.warm {
+      background: var(--warm);
+      border-color: var(--line);
+    }
+
+    .summary-box.white {
+      background: #fff;
+      border-color: var(--line);
+    }
+
+    .summary-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 5px;
+    }
+
+    .summary-value {
+      font-size: 26px;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+      line-height: 1.06;
+    }
+
+    .summary-sub {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 5px;
+      line-height: 1.35;
+    }
+
+    .status {
+      min-height: 18px;
+      color: var(--success);
+      font-size: 13px;
+      font-weight: 800;
+      margin-top: 8px;
+    }
+
+    .entry-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .entry-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .entry-main {
+      min-width: 0;
+    }
+
+    .entry-date {
+      font-weight: 950;
+      font-size: 15px;
+    }
+
+    .entry-detail {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+      margin-top: 3px;
+    }
+
+    .entry-pay {
+      text-align: right;
+      font-weight: 950;
+      color: var(--accent-dark);
+      white-space: nowrap;
+    }
+
+    .entry-hours {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+      margin-top: 3px;
+    }
+
+    .mini-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 10px;
+    }
+
+    .sticky {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 20;
+      padding: 10px 14px calc(10px + var(--safe-bottom));
+      background: rgba(255, 255, 255, 0.9);
+      border-top: 1px solid var(--line);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 -10px 28px rgba(37, 33, 29, 0.08);
+    }
+
+    .sticky-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .sticky-box {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 10px 12px;
+    }
+
+    .sticky-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .sticky-value {
+      font-size: 20px;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+      margin-top: 2px;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      margin-top: 9px;
+    }
+
+    .month-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .missing-badge {
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 950;
+      color: var(--danger);
+      background: var(--danger-soft);
+      border: 1px solid #f0c5c5;
+      white-space: nowrap;
+    }
+
+    .missing-badge.all-good {
+      color: var(--success);
+      background: var(--success-soft);
+      border-color: #cde3d2;
+    }
+
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .date-chip {
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      padding: 10px 4px;
+      min-height: 62px;
+      background: #fff;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      line-height: 1.05;
+      cursor: pointer;
+    }
+
+    .date-chip .day-num {
+      font-size: 18px;
+      font-weight: 950;
+      letter-spacing: -0.03em;
+    }
+
+    .date-chip .day-name {
+      margin-top: 4px;
+      font-size: 11px;
+      font-weight: 850;
+      color: var(--muted);
+    }
+
+    .date-chip .chip-status {
+      margin-top: 4px;
+      font-size: 10px;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .date-chip.filled {
+      background: var(--success-soft);
+      border-color: #cde3d2;
+    }
+
+    .date-chip.filled .chip-status {
+      color: var(--success);
+    }
+
+    .date-chip.missing {
+      background: var(--danger-soft);
+      border-color: #efbcbc;
+      box-shadow: 0 0 0 2px rgba(184, 92, 92, 0.08);
+    }
+
+    .date-chip.missing .chip-status {
+      color: var(--danger);
+    }
+
+    .date-chip.upcoming {
+      background: var(--upcoming);
+      opacity: 0.82;
+    }
+
+    .date-chip.upcoming .chip-status {
+      color: var(--muted);
+    }
+
+    .date-chip.holiday {
+      background: var(--warm);
+      border-color: var(--line);
+    }
+
+    .date-chip.holiday .chip-status {
+      color: #8b6b4e;
+    }
+
+    .date-chip.public-holiday {
+      background: var(--accent-soft);
+      border-color: rgba(111, 143, 159, 0.25);
+    }
+
+    .date-chip.public-holiday .chip-status {
+      color: var(--accent-dark);
+    }
+
+    .date-chip.today {
+      outline: 3px solid rgba(111, 143, 159, 0.22);
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .dot.missing { background: var(--danger-soft); border-color: #efbcbc; }
+    .dot.filled { background: var(--success-soft); border-color: #cde3d2; }
+    .dot.upcoming { background: var(--upcoming); }
+    .dot.holiday { background: var(--warm); }
+    .dot.ph { background: var(--accent-soft); border-color: rgba(111, 143, 159, 0.25); }
+
+    @media (min-width: 640px) {
+      body {
+        padding: 22px;
+        padding-bottom: calc(112px + var(--safe-bottom));
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .mode-options {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .summary-grid .wide {
+        grid-column: auto;
+      }
+
+      .month-grid {
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 380px) {
+      body {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .grid.two,
+      .summary-grid,
+      .sticky-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .sticky-value {
+        font-size: 18px;
+      }
+
+      .month-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .sticky,
+      .mini-actions,
+      #saveEntryBtn,
+      #deleteDateBtn,
+      #exportBtn,
+      #printBtn,
+      #clearCycleBtn {
+        display: none;
+      }
+
+      .card {
+        box-shadow: none;
+      }
+    }
+  </style>
+
+  <style id="mobile-overlap-fix">
+    html, body {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    .app,
+    .card,
+    .grid,
+    .summary-grid,
+    .mini-actions,
+    .mode-options,
+    .sticky-inner,
+    .entry-row {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .card {
+      width: 100%;
+    }
+
+    .grid.two,
+    .mini-actions,
+    .summary-grid,
+    .sticky-inner {
+      grid-template-columns: 1fr !important;
+    }
+
+    input,
+    select,
+    button {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    input[type="date"],
+    input[type="month"],
+    input[type="time"],
+    input[type="number"],
+    input[type="text"] {
+      -webkit-appearance: none;
+      appearance: none;
+      text-align: left;
+      height: 52px;
+      line-height: normal;
+    }
+
+    input[type="date"],
+    input[type="month"] {
+      text-align: center;
+    }
+
+    .mode-options {
+      grid-template-columns: 1fr !important;
+    }
+
+    .mode-box {
+      width: 100%;
+    }
+
+    .summary-grid .wide {
+      grid-column: auto !important;
+    }
+
+    .month-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .date-chip {
+      min-width: 0;
+      padding-left: 2px;
+      padding-right: 2px;
+    }
+
+    .date-chip .chip-status {
+      font-size: 9px;
+    }
+
+    .entry-row {
+      grid-template-columns: 1fr !important;
+    }
+
+    .entry-pay {
+      text-align: left;
+    }
+
+    @media (min-width: 520px) {
+      .grid.two,
+      .mini-actions,
+      .sticky-inner {
+        grid-template-columns: 1fr 1fr !important;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr 1fr !important;
+      }
+
+      .mode-options {
+        grid-template-columns: 1fr !important;
+      }
+
+      .month-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      .entry-row {
+        grid-template-columns: 1fr auto !important;
+      }
+
+      .entry-pay {
+        text-align: right;
+      }
+    }
+
+    @media (min-width: 720px) {
+      .summary-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+      }
+
+      .mode-options {
+        grid-template-columns: repeat(3, 1fr) !important;
+      }
+
+      .month-grid {
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+      }
+    }
+  </style>
+
+
+  <style id="weekend-no-work-fix">
+    .date-chip.weekend {
+      background: #f2f2f2;
+      border-color: #dedede;
+      color: #777;
+      opacity: 0.92;
+    }
+
+    .date-chip.weekend .chip-status {
+      color: #777;
+    }
+
+    .dot.weekend {
+      background: #f2f2f2;
+      border-color: #dedede;
+    }
+  </style>
+
+</head>
+
+<body>
+  <main class="app">
+    <section class="card hero">
+      <div class="hero-top">
+        <div>
+          <h1>FAJT Pay</h1>
+          <p class="subtitle">Choose a date, enter that day’s status, and save. The monthly view shows missing past dates.</p>
+        </div>
+        <div class="pill">S$48/hr</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Cycle settings</h2>
+      <div class="grid two">
+        <div>
+          <label for="month">Month</label>
+          <input id="month" type="month" />
+        </div>
+        <div>
+          <label for="cycle">Pay cycle</label>
+          <select id="cycle">
+            <option value="first">1st–15th</option>
+            <option value="second">16th–month end</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid two" style="margin-top: 12px;">
+        <div>
+          <label for="hourlyRate">Hourly rate</label>
+          <input id="hourlyRate" type="number" min="0" step="0.01" value="48" inputmode="decimal" />
+        </div>
+        <div>
+          <label for="publicHolidayRate">Public holiday pay</label>
+          <input id="publicHolidayRate" type="number" min="0" step="0.01" value="264" inputmode="decimal" />
+        </div>
+      </div>
+
+      <p class="note">1st–15th is paid on the 23rd. 16th–month end is paid on the 8th of the following month.</p>
+    </section>
+
+    <section class="card">
+      <div class="month-header">
+        <div>
+          <h2 style="margin-bottom: 4px;">Monthly view</h2>
+          <p class="note" style="margin-top: 0;">Tap any date to fill or edit it.</p>
+        </div>
+        <div class="missing-badge" id="missingBadge">—</div>
+      </div>
+
+      <div class="month-grid" id="monthGrid"></div>
+
+      <div class="legend">
+        <div class="legend-item"><span class="dot missing"></span>Missing</div>
+        <div class="legend-item"><span class="dot filled"></span>Filled</div>
+        <div class="legend-item"><span class="dot upcoming"></span>Upcoming</div>
+        <div class="legend-item"><span class="dot weekend"></span>Weekend</div>
+        <div class="legend-item"><span class="dot holiday"></span>School holiday</div>
+        <div class="legend-item"><span class="dot ph"></span>Public holiday</div>
+      </div>
+    </section>
+
+    <section class="card" id="inputCard">
+      <h2>Input one date</h2>
+
+      <div class="grid">
+        <div>
+          <label for="entryDate">Date</label>
+          <input id="entryDate" type="date" />
+        </div>
+
+        <div>
+          <label>Day type</label>
+          <div class="mode-options">
+            <label class="mode">
+              <input type="radio" name="dayType" value="normal" checked />
+              <div class="mode-box">
+                <div class="mode-title">Normal work day</div>
+                <div class="mode-sub">Uses time in/out × S$48/hr.</div>
+              </div>
+            </label>
+
+            <label class="mode">
+              <input type="radio" name="dayType" value="schoolHoliday" />
+              <div class="mode-box">
+                <div class="mode-title">School holiday</div>
+                <div class="mode-sub">Saved as S$0. No hours needed.</div>
+              </div>
+            </label>
+
+            <label class="mode">
+              <input type="radio" name="dayType" value="publicHoliday" />
+              <div class="mode-box">
+                <div class="mode-title">Public holiday</div>
+                <div class="mode-sub">Auto S$264. No hours needed.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="time-section" id="timeSection">
+          <div class="grid two">
+            <div>
+              <label for="timeIn">Time in</label>
+              <input id="timeIn" type="time" />
+            </div>
+            <div>
+              <label for="timeOut">Time out</label>
+              <input id="timeOut" type="time" />
+            </div>
+          </div>
+
+          <div class="grid two" style="margin-top: 12px;">
+            <div>
+              <label for="breakMinutes">Break, min</label>
+              <input id="breakMinutes" type="number" min="0" step="1" placeholder="0" inputmode="numeric" />
+            </div>
+            <div>
+              <label for="notes">Notes</label>
+              <input id="notes" type="text" placeholder="Optional" />
+            </div>
+          </div>
+
+          <div class="mini-actions">
+            <button class="btn-secondary" type="button" data-quick="07:45,14:00">7:45–2:00</button>
+            <button class="btn-secondary" type="button" data-quick="07:30,13:30">7:30–1:30</button>
+          </div>
+        </div>
+
+        <button class="btn-primary" id="saveEntryBtn">Save this date</button>
+
+        <div class="mini-actions">
+          <button class="btn-secondary" id="deleteDateBtn">Delete selected date</button>
+          <button class="btn-danger" id="clearCycleBtn">Clear whole cycle</button>
+        </div>
+
+        <div class="status" id="status"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Cycle summary</h2>
+
+      <div class="summary-grid">
+        <div class="summary-box">
+          <div class="summary-label">Total hours</div>
+          <div class="summary-value" id="totalPretty">0h 00m</div>
+          <div class="summary-sub" id="totalDecimal">0.00 hours</div>
+        </div>
+
+        <div class="summary-box warm">
+          <div class="summary-label">Gross pay</div>
+          <div class="summary-value" id="estimatedPay">S$0.00</div>
+          <div class="summary-sub" id="payBreakdown">Normal work + public holiday pay</div>
+        </div>
+
+        <div class="summary-box white wide">
+          <div class="summary-label">Payment date</div>
+          <div class="summary-value" id="paymentDate">—</div>
+          <div class="summary-sub" id="cycleRange">—</div>
+        </div>
+      </div>
+
+      <div class="mini-actions">
+        <button class="btn-secondary" id="exportBtn">Export CSV</button>
+        <button class="btn-secondary" id="printBtn">Print</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Saved entries</h2>
+      <div class="entry-list" id="entryList"></div>
+    </section>
+  </main>
+
+  <section class="sticky">
+    <div class="sticky-inner">
+      <div class="sticky-box">
+        <div class="sticky-label">Total</div>
+        <div class="sticky-value" id="stickyTotal">0h 00m</div>
+      </div>
+      <div class="sticky-box">
+        <div class="sticky-label">Pay</div>
+        <div class="sticky-value" id="stickyPay">S$0.00</div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const monthInput = document.getElementById("month");
+    const cycleInput = document.getElementById("cycle");
+    const hourlyRateInput = document.getElementById("hourlyRate");
+    const publicHolidayRateInput = document.getElementById("publicHolidayRate");
+
+    const entryDateInput = document.getElementById("entryDate");
+    const timeSection = document.getElementById("timeSection");
+    const timeInInput = document.getElementById("timeIn");
+    const timeOutInput = document.getElementById("timeOut");
+    const breakInput = document.getElementById("breakMinutes");
+    const notesInput = document.getElementById("notes");
+
+    const saveEntryBtn = document.getElementById("saveEntryBtn");
+    const deleteDateBtn = document.getElementById("deleteDateBtn");
+    const clearCycleBtn = document.getElementById("clearCycleBtn");
+    const exportBtn = document.getElementById("exportBtn");
+    const printBtn = document.getElementById("printBtn");
+    const statusEl = document.getElementById("status");
+    const entryList = document.getElementById("entryList");
+    const monthGrid = document.getElementById("monthGrid");
+    const missingBadge = document.getElementById("missingBadge");
+    const inputCard = document.getElementById("inputCard");
+
+    const totalPretty = document.getElementById("totalPretty");
+    const totalDecimal = document.getElementById("totalDecimal");
+    const estimatedPay = document.getElementById("estimatedPay");
+    const payBreakdown = document.getElementById("payBreakdown");
+    const paymentDate = document.getElementById("paymentDate");
+    const cycleRange = document.getElementById("cycleRange");
+    const stickyTotal = document.getElementById("stickyTotal");
+    const stickyPay = document.getElementById("stickyPay");
+
+    const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    function pad(n) {
+      return String(n).padStart(2, "0");
+    }
+
+    function todayMonthValue() {
+      const d = new Date();
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+    }
+
+    function todayISO() {
+      const d = new Date();
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    }
+
+    function getMonthParts() {
+      const [year, month] = monthInput.value.split("-").map(Number);
+      return { year, monthIndex: month - 1, month };
+    }
+
+    function getDateParts(iso) {
+      const [year, month, day] = iso.split("-").map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    function lastDayOfMonth(year, monthIndex) {
+      return new Date(year, monthIndex + 1, 0).getDate();
+    }
+
+    function storageKey() {
+      return `fajt-simple-v6-${monthInput.value}-${cycleInput.value}`;
+    }
+
+    function formatMoney(amount) {
+      return "S$" + Number(amount || 0).toLocaleString("en-SG", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function formatDate(date) {
+      return `${pad(date.getDate())} ${months[date.getMonth()]} ${date.getFullYear()}`;
+    }
+
+    function formatDateISO(date) {
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+    }
+
+    function parseTimeToMinutes(time) {
+      if (!time) return null;
+      const [h, m] = time.split(":").map(Number);
+      return h * 60 + m;
+    }
+
+    function minutesToPretty(totalMinutes) {
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+      return `${hours}h ${pad(minutes)}m`;
+    }
+
+    function calculateWorkMinutes(timeIn, timeOut, breakMinutes) {
+      const start = parseTimeToMinutes(timeIn);
+      const end = parseTimeToMinutes(timeOut);
+
+      if (start === null || end === null) return 0;
+
+      let diff = end - start;
+      if (diff < 0) diff += 24 * 60;
+
+      diff -= Number(breakMinutes || 0);
+      return Math.max(0, Math.round(diff));
+    }
+
+    function getSelectedDayType() {
+      return document.querySelector("input[name='dayType']:checked").value;
+    }
+
+    function setDayType(type) {
+      const radio = document.querySelector(`input[name='dayType'][value='${type}']`);
+      if (radio) radio.checked = true;
+      updateModeVisibility();
+    }
+
+    function getSavedData() {
+      try {
+        return JSON.parse(localStorage.getItem(storageKey())) || {};
+      } catch {
+        return {};
+      }
+    }
+
+    function saveAll(data) {
+      localStorage.setItem(storageKey(), JSON.stringify(data));
+    }
+
+    function getSettingsFallback() {
+      const keys = [
+        `fajt-simple-v6-${monthInput.value}-first`,
+        `fajt-simple-v6-${monthInput.value}-second`,
+        `fajt-simple-v3-${monthInput.value}-first`,
+        `fajt-simple-v3-${monthInput.value}-second`
+      ];
+
+      for (const key of keys) {
+        try {
+          const data = JSON.parse(localStorage.getItem(key));
+          if (data) {
+            return {
+              hourlyRate: data.hourlyRate || "48",
+              publicHolidayRate: data.publicHolidayRate || "264"
+            };
+          }
+        } catch {}
+      }
+
+      return { hourlyRate: "48", publicHolidayRate: "264" };
+    }
+
+    function getCycleStartEnd() {
+      const { year, monthIndex } = getMonthParts();
+      const last = lastDayOfMonth(year, monthIndex);
+      const start = cycleInput.value === "first" ? 1 : 16;
+      const end = cycleInput.value === "first" ? 15 : last;
+      return { year, monthIndex, start, end, last };
+    }
+
+    function isWithinSelectedCycle(iso) {
+      const { year, monthIndex, start, end } = getCycleStartEnd();
+      const d = getDateParts(iso);
+      return d.getFullYear() === year && d.getMonth() === monthIndex && d.getDate() >= start && d.getDate() <= end;
+    }
+
+    function setDateMinMax() {
+      const { year, monthIndex, start, end } = getCycleStartEnd();
+      const min = `${year}-${pad(monthIndex + 1)}-${pad(start)}`;
+      const max = `${year}-${pad(monthIndex + 1)}-${pad(end)}`;
+
+      entryDateInput.min = min;
+      entryDateInput.max = max;
+
+      if (!entryDateInput.value || entryDateInput.value < min || entryDateInput.value > max) {
+        entryDateInput.value = min;
+      }
+    }
+
+    function updatePaymentDisplay() {
+      const { year, monthIndex, last } = getCycleStartEnd();
+
+      if (cycleInput.value === "first") {
+        const payDate = new Date(year, monthIndex, 23);
+        paymentDate.textContent = formatDate(payDate);
+        cycleRange.textContent = `Work from 01 ${months[monthIndex]} to 15 ${months[monthIndex]} ${year}.`;
+      } else {
+        const payDate = new Date(year, monthIndex + 1, 8);
+        paymentDate.textContent = formatDate(payDate);
+        cycleRange.textContent = `Work from 16 ${months[monthIndex]} to ${pad(last)} ${months[monthIndex]} ${year}.`;
+      }
+    }
+
+    function updateModeVisibility() {
+      const type = getSelectedDayType();
+      timeSection.classList.toggle("hidden", type !== "normal");
+    }
+
+    function loadDateIntoForm() {
+      const data = getSavedData();
+      const entry = data.entries?.[entryDateInput.value];
+
+      if (!entry) {
+        setDayType("normal");
+        timeInInput.value = "";
+        timeOutInput.value = "";
+        breakInput.value = "";
+        notesInput.value = "";
+        return;
+      }
+
+      setDayType(entry.type || "normal");
+      timeInInput.value = entry.timeIn || "";
+      timeOutInput.value = entry.timeOut || "";
+      breakInput.value = entry.breakMinutes || "";
+      notesInput.value = entry.notes || "";
+    }
+
+    function saveSelectedEntry() {
+      const data = getSavedData();
+      data.hourlyRate = hourlyRateInput.value || "48";
+      data.publicHolidayRate = publicHolidayRateInput.value || "264";
+      data.entries = data.entries || {};
+
+      const type = getSelectedDayType();
+      const date = entryDateInput.value;
+
+      if (!date) {
+        statusEl.textContent = "Please select a date.";
+        return;
+      }
+
+      if (!isWithinSelectedCycle(date)) {
+        statusEl.textContent = "Please choose a date inside the selected pay cycle.";
+        return;
+      }
+
+      const selectedDateObj = getDateParts(date);
+      const selectedIsWeekend = selectedDateObj.getDay() === 0 || selectedDateObj.getDay() === 6;
+
+      if (selectedIsWeekend && type === "normal") {
+        statusEl.textContent = "Weekends are treated as no work. No entry needed.";
+        return;
+      }
+
+      if (type === "normal" && (!timeInInput.value || !timeOutInput.value)) {
+        statusEl.textContent = "Please enter time in and time out.";
+        return;
+      }
+
+      data.entries[date] = {
+        type,
+        timeIn: type === "normal" ? timeInInput.value : "",
+        timeOut: type === "normal" ? timeOutInput.value : "",
+        breakMinutes: type === "normal" ? (breakInput.value || "") : "",
+        notes: notesInput.value || ""
+      };
+
+      saveAll(data);
+      renderSummary();
+
+      statusEl.textContent = "Saved this date.";
+      setTimeout(() => statusEl.textContent = "", 1800);
+    }
+
+    function deleteSelectedDate() {
+      const data = getSavedData();
+      if (!data.entries?.[entryDateInput.value]) {
+        statusEl.textContent = "No saved entry for this date.";
+        setTimeout(() => statusEl.textContent = "", 1800);
+        return;
+      }
+
+      delete data.entries[entryDateInput.value];
+      saveAll(data);
+      loadDateIntoForm();
+      renderSummary();
+
+      statusEl.textContent = "Deleted selected date.";
+      setTimeout(() => statusEl.textContent = "", 1800);
+    }
+
+    function clearCycle() {
+      if (!confirm("Clear all saved entries for this selected cycle?")) return;
+      localStorage.removeItem(storageKey());
+      loadCycle();
+      statusEl.textContent = "Cycle cleared.";
+      setTimeout(() => statusEl.textContent = "", 1800);
+    }
+
+    function getEntryAmounts(entry, hourlyRate, publicHolidayRate) {
+      if (!entry) return { minutes: 0, pay: 0, label: "No entry" };
+
+      if (entry.type === "schoolHoliday") {
+        return { minutes: 0, pay: 0, label: "School holiday" };
+      }
+
+      if (entry.type === "publicHoliday") {
+        return { minutes: 0, pay: publicHolidayRate, label: "Public holiday" };
+      }
+
+      const minutes = calculateWorkMinutes(entry.timeIn, entry.timeOut, entry.breakMinutes);
+      const pay = (minutes / 60) * hourlyRate;
+      return { minutes, pay, label: `${entry.timeIn || "--:--"}–${entry.timeOut || "--:--"}` };
+    }
+
+    function renderMonthGrid(entries) {
+      const { year, monthIndex, start, end } = getCycleStartEnd();
+      const today = new Date();
+      const todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+      monthGrid.innerHTML = "";
+      let missingPastCount = 0;
+
+      for (let day = start; day <= end; day++) {
+        const date = new Date(year, monthIndex, day);
+        const dateOnly = new Date(year, monthIndex, day);
+        const iso = formatDateISO(date);
+        const entry = entries[iso];
+        const isPastOrToday = dateOnly <= todayDateOnly;
+        const isToday = formatDateISO(todayDateOnly) === iso;
+
+        let statusClass = "upcoming";
+        let statusLabel = "Upcoming";
+
+        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+
+        if (entry) {
+          if (entry.type === "schoolHoliday") {
+            statusClass = "holiday";
+            statusLabel = "Sch Hol";
+          } else if (entry.type === "publicHoliday") {
+            statusClass = "public-holiday";
+            statusLabel = "PH";
+          } else {
+            statusClass = "filled";
+            statusLabel = "Filled";
+          }
+        } else if (isWeekend) {
+          statusClass = "weekend";
+          statusLabel = "Weekend";
+        } else if (isPastOrToday) {
+          statusClass = "missing";
+          statusLabel = "Missing";
+          missingPastCount++;
+        }
+
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = `date-chip ${statusClass}${isToday ? " today" : ""}`;
+        chip.setAttribute("aria-label", `${formatDate(date)} ${statusLabel}`);
+        chip.innerHTML = `
+          <div class="day-num">${pad(day)}</div>
+          <div class="day-name">${weekdays[date.getDay()]}</div>
+          <div class="chip-status">${statusLabel}</div>
+        `;
+
+        chip.addEventListener("click", () => {
+          if (isWeekend && !entries[iso]) {
+            statusEl.textContent = "Weekend selected — no work entry needed.";
+            setTimeout(() => statusEl.textContent = "", 1800);
+            return;
+          }
+
+          entryDateInput.value = iso;
+          loadDateIntoForm();
+          inputCard.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+        monthGrid.appendChild(chip);
+      }
+
+      if (missingPastCount === 0) {
+        missingBadge.textContent = "No missing past dates";
+        missingBadge.classList.add("all-good");
+      } else {
+        missingBadge.textContent = `${missingPastCount} missing`;
+        missingBadge.classList.remove("all-good");
+      }
+    }
+
+    function renderSummary() {
+      const data = getSavedData();
+      const entries = data.entries || {};
+      const hourlyRate = Number(hourlyRateInput.value || data.hourlyRate || 48);
+      const publicHolidayRate = Number(publicHolidayRateInput.value || data.publicHolidayRate || 264);
+
+      let totalMinutes = 0;
+      let totalPay = 0;
+      let normalPay = 0;
+      let publicHolidayPay = 0;
+      let schoolHolidayCount = 0;
+      let publicHolidayCount = 0;
+
+      const dates = Object.keys(entries).sort();
+      entryList.innerHTML = "";
+
+      if (dates.length === 0) {
+        entryList.innerHTML = `<div class="entry-row"><div class="entry-main"><div class="entry-date">No entries yet</div><div class="entry-detail">Choose a date above and save it.</div></div></div>`;
+      }
+
+      dates.forEach(date => {
+        const entry = entries[date];
+        const amount = getEntryAmounts(entry, hourlyRate, publicHolidayRate);
+        const d = getDateParts(date);
+
+        totalMinutes += amount.minutes;
+        totalPay += amount.pay;
+
+        if (entry.type === "publicHoliday") {
+          publicHolidayPay += amount.pay;
+          publicHolidayCount++;
+        } else if (entry.type === "schoolHoliday") {
+          schoolHolidayCount++;
+        } else {
+          normalPay += amount.pay;
+        }
+
+        const row = document.createElement("div");
+        row.className = "entry-row";
+        row.innerHTML = `
+          <div class="entry-main">
+            <div class="entry-date">${formatDate(d)} · ${weekdays[d.getDay()]}</div>
+            <div class="entry-detail">${amount.label}${entry.notes ? " · " + entry.notes : ""}</div>
+          </div>
+          <div class="entry-pay">
+            ${formatMoney(amount.pay)}
+            <div class="entry-hours">${minutesToPretty(amount.minutes)}</div>
+          </div>
+        `;
+
+        row.addEventListener("click", () => {
+          entryDateInput.value = date;
+          loadDateIntoForm();
+          inputCard.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+        entryList.appendChild(row);
+      });
+
+      totalPretty.textContent = minutesToPretty(totalMinutes);
+      totalDecimal.textContent = `${(totalMinutes / 60).toFixed(2)} hours`;
+      estimatedPay.textContent = formatMoney(totalPay);
+      stickyTotal.textContent = minutesToPretty(totalMinutes);
+      stickyPay.textContent = formatMoney(totalPay);
+
+      payBreakdown.textContent = `${formatMoney(normalPay)} normal pay + ${formatMoney(publicHolidayPay)} PH pay · ${schoolHolidayCount} school holiday · ${publicHolidayCount} public holiday`;
+
+      renderMonthGrid(entries);
+    }
+
+    function exportCSV() {
+      const data = getSavedData();
+      const entries = data.entries || {};
+      const hourlyRate = Number(hourlyRateInput.value || data.hourlyRate || 48);
+      const publicHolidayRate = Number(publicHolidayRateInput.value || data.publicHolidayRate || 264);
+
+      const rows = [[
+        "Date",
+        "Day",
+        "Type",
+        "Time In",
+        "Time Out",
+        "Break Minutes",
+        "Notes",
+        "Total Minutes",
+        "Total Hours",
+        "Gross Pay"
+      ]];
+
+      let totalMinutes = 0;
+      let totalPay = 0;
+
+      Object.keys(entries).sort().forEach(date => {
+        const entry = entries[date];
+        const d = getDateParts(date);
+        const amount = getEntryAmounts(entry, hourlyRate, publicHolidayRate);
+
+        totalMinutes += amount.minutes;
+        totalPay += amount.pay;
+
+        rows.push([
+          date,
+          weekdays[d.getDay()],
+          entry.type,
+          entry.timeIn || "",
+          entry.timeOut || "",
+          entry.breakMinutes || "",
+          entry.notes || "",
+          amount.minutes,
+          (amount.minutes / 60).toFixed(2),
+          amount.pay.toFixed(2)
+        ]);
+      });
+
+      rows.push([]);
+      rows.push(["Total Minutes", totalMinutes]);
+      rows.push(["Total Hours", (totalMinutes / 60).toFixed(2)]);
+      rows.push(["Hourly Rate", hourlyRate.toFixed(2)]);
+      rows.push(["Public Holiday Pay", publicHolidayRate.toFixed(2)]);
+      rows.push(["Estimated Gross Pay", totalPay.toFixed(2)]);
+      rows.push(["Expected Payment Date", paymentDate.textContent]);
+
+      const csv = rows
+        .map(row => row.map(cell => `"${String(cell).replaceAll('"', '""')}"`).join(","))
+        .join("\n");
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `FAJT_${monthInput.value}_${cycleInput.value}_cycle.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function loadCycle() {
+      const data = getSavedData();
+      const fallback = getSettingsFallback();
+
+      hourlyRateInput.value = data.hourlyRate || fallback.hourlyRate || "48";
+      publicHolidayRateInput.value = data.publicHolidayRate || fallback.publicHolidayRate || "264";
+
+      setDateMinMax();
+      updatePaymentDisplay();
+      loadDateIntoForm();
+      renderSummary();
+    }
+
+    function saveSettingsOnly() {
+      const data = getSavedData();
+      data.hourlyRate = hourlyRateInput.value || "48";
+      data.publicHolidayRate = publicHolidayRateInput.value || "264";
+      data.entries = data.entries || {};
+      saveAll(data);
+      renderSummary();
+    }
+
+    monthInput.value = todayMonthValue();
+    cycleInput.value = new Date().getDate() <= 15 ? "first" : "second";
+    entryDateInput.value = todayISO();
+
+    monthInput.addEventListener("change", loadCycle);
+    cycleInput.addEventListener("change", loadCycle);
+    hourlyRateInput.addEventListener("input", saveSettingsOnly);
+    publicHolidayRateInput.addEventListener("input", saveSettingsOnly);
+
+    entryDateInput.addEventListener("change", loadDateIntoForm);
+
+    document.querySelectorAll("input[name='dayType']").forEach(radio => {
+      radio.addEventListener("change", updateModeVisibility);
+    });
+
+    document.querySelectorAll("[data-quick]").forEach(button => {
+      button.addEventListener("click", () => {
+        const [timeIn, timeOut] = button.dataset.quick.split(",");
+        timeInInput.value = timeIn;
+        timeOutInput.value = timeOut;
+      });
+    });
+
+    saveEntryBtn.addEventListener("click", saveSelectedEntry);
+    deleteDateBtn.addEventListener("click", deleteSelectedDate);
+    clearCycleBtn.addEventListener("click", clearCycle);
+    exportBtn.addEventListener("click", exportCSV);
+    printBtn.addEventListener("click", () => window.print());
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+      });
+    }
+
+    loadCycle();
+  </script>
+</body>
+</html>
